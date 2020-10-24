@@ -10,13 +10,16 @@ from check_light_func import check_light
 #
 from time import sleep
 from datetime import datetime
+import os
+import shutil
 
 dest_photo = '/home/pi/Desktop/sysconfig_rpi-sputnik-portable-1/day-and-night-timelapse/timelapse/{timestamp:%a-%d.%m.%Y-%H-%M-%S}'+'_{counter:05d}.jpg'
 dest_location = '/home/pi/Desktop/sysconfig_rpi-sputnik-portable-1/day-and-night-timelapse/timelapse/*'
+ineligible_files = './ineligible_files/'
 
 def helloday():
    print ('[INFO]: Switching to Day Mode')
-   
+
 def hellonight():
    print ('[INFO]: Switching to Night Mode')
 
@@ -42,12 +45,14 @@ def night_mode():
       print ('[INFO]: light is ' + str(check_light.light))
       if check_light.light < 650:
          print ('[INFO]: '+(check_light.img +' is a night photo'))
-      else: 
+      else:
          print ('[INFO]: '+(check_light.img +' is a day photo'))
+         ineligible = os.path.basename(check_light.img)
+         shutil.move(check_light.img, ineligible_files+ineligible)
          helloday()
          camera.close()
          day_mode()
-         break 
+         break
 
 ### Day Mode
 def day_mode():
@@ -61,13 +66,13 @@ def day_mode():
          print ('[INFO]: light is ' + str(check_light.light))
          if check_light.light < 240:
             print ('[INFO]: '+(check_light.img +' is a night photo'))
+            ineligible = os.path.basename(check_light.img)
+            shutil.move(check_light.img, ineligible_files+ineligible)
             hellonight()
             camera.close()
             night_mode()
-            break 
-         else: 
+            break
+         else:
             print ('[INFO]: '+(check_light.img +' is a day photo'))
-            
+
 day_mode()
-
-
